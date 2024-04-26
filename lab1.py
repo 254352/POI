@@ -44,23 +44,19 @@ def generate_points_C(num_points:int=2000, r:int=10):
 
 
 cloud_points_A = generate_points_A(2000)
-with open('podpunktA.xyz', 'w', encoding='utf-8', newline='\n') as csvfile:
+
+cloud_points_B= generate_points_B(2000)
+
+cloud_points_C = generate_points_C(2000,75)
+
+with open('points.xyz', 'w', encoding='utf-8', newline='\n') as csvfile:
     csvwriter = writer(csvfile)
     # csvwriter.writerow('x','y','z') nagłówek
     for p in cloud_points_A:
-        csvwriter.writerow(p)
+         csvwriter.writerow(p)
 
-cloud_points_B = generate_points_B(2000)
-with open('podpunktB.xyz', 'w', encoding='utf-8', newline='\n') as csvfile:
-    csvwriter = writer(csvfile)
-    # csvwriter.writerow('x','y','z') nagłówek
     for p in cloud_points_B:
         csvwriter.writerow(p)
 
-
-cloud_points_C = generate_points_C(2000,75)
-with open('podpunktC.xyz', 'w', encoding='utf-8', newline='\n') as csvfile:
-    csvwriter = writer(csvfile)
-    # csvwriter.writerow('x','y','z') nagłówek
     for p in cloud_points_C:
-         csvwriter.writerow(p)
+        csvwriter.writerow(p)
