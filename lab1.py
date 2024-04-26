@@ -20,3 +20,4 @@ with open('LidarData.xyz', 'w', encoding='utf-8', newline='\n') as csvfile:
     # csvwriter.writerow('x','y','z') nagłówek
     for p in cloud_points:
         csvwriter.writerow(p)
+
