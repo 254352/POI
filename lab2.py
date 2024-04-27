@@ -19,6 +19,7 @@ points_xyz =[]
 for p in points_reader():
     points_xyz.append(p)
 
+#k-średnich
 clusterer = KMeans(n_clusters=3)
 X = np.array(points_xyz)
 y_pred = clusterer.fit_predict(X)
