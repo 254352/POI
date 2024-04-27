@@ -73,12 +73,12 @@ plt.show()
 
 plane1 = pyrsc.Plane()
 best_eq_red, best_inliers_red = plane1.fit(X[red,:], 0.01)
-print(best_eq_red)
+print("Plane equation Ax+By+Cz+D for red: ", best_eq_red)
 
 plane2 = pyrsc.Plane()
 best_eq_blue, best_inliers_blue = plane2.fit(X[blue,:], 0.01)
-print(best_eq_blue)
+print("Plane equation Ax+By+Cz+D for blue: ", best_eq_blue)
 
 plane3 = pyrsc.Plane()
 best_eq_green, best_inliers_green = plane3.fit(X[green,:], 0.01)
-print(best_eq_green)
+print("Plane equation Ax+By+Cz+D for green: ", best_eq_green)
