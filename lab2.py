@@ -3,62 +3,12 @@ import csv
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import RANSACRegressor
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+import numpy as np
+import pyransac3d as pyrsc
 
-
-
-'''
-# Generujemy przykładową chmurę punktów z szumem
-np.random.seed(0)
-n_samples = 100
-n_outliers = 10
-
-# Płaszczyzna prawdziwa
-X = np.random.normal(size=(n_samples, 3))
-X[:, 2] = 3 * X[:, 0] + 2 * X[:, 1] + 1
-
-# Dodajemy szum (outliers)
-outliers = np.random.uniform(low=-10, high=10, size=(n_outliers, 3))
-X[:n_outliers] = outliers
-
-# Dopasowujemy model RANSAC
-ransac = RANSACRegressor(estimator=LinearRegression(), min_samples=3, residual_threshold=2.0, max_trials=100)
-ransac.fit(X[:, :2], X[:, 2])
-
-# Współczynniki płaszczyzny
-a, b = ransac.estimator_.coef_
-c = ransac.estimator_.intercept_
-
-# Wizualizacja wyników
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Punkty oryginalne
-ax.scatter(X[:, 0], X[:, 1], X[:, 2], color='b', label='Points')
-
-# Siatka dla płaszczyzny
-x1 = np.linspace(min(X[:, 0]), max(X[:, 0]), 10)
-x2 = np.linspace(min(X[:, 1]), max(X[:, 1]), 10)
-X1, X2 = np.meshgrid(x1, x2)
-Z = a * X1 + b * X2 + c
-
-# Rysujemy płaszczyznę
-ax.plot_surface(X1, X2, Z, alpha=0.5, color='g', label='RANSAC Plane')
-
-ax.set_xlabel('X1')
-ax.set_ylabel('X2')
-ax.set_zlabel('Z')
-
-plt.show()
-
-print("Współczynniki płaszczyzny:")
-print("a =", a)
-print("b =", b)
-print("c =", c)
-'''
+#otwieranie pliku xyz
 def points_reader():
     with open('points.xyz', newline='') as xyzfile:
         reader = csv.reader(xyzfile, delimiter=',')
@@ -68,7 +18,6 @@ def points_reader():
 points_xyz =[]
 for p in points_reader():
     points_xyz.append(p)
-
 
 clusterer = KMeans(n_clusters=3)
 X = np.array(points_xyz)
@@ -87,3 +36,49 @@ plt.scatter(X[red, 0], X[red, 1], X[red, 2], c="r")
 plt.scatter(X[blue, 0], X[blue, 1], X[blue, 2], c="b")
 plt.scatter(X[green, 0], X[green, 1], X[green, 2], c="g")
 plt.show()
+
+###########################################################
+
+y_pred1 = DBSCAN(eps=0.3, min_samples=10).fit(X)
+
+# Identify unique clusters
+unique_labels = np.unique(y_pred)
+
+# Set up the 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.set_xlabel('X Axis')
+ax.set_ylabel('Y Axis')
+ax.set_zlabel('Z Axis')
+
+# Assign colors to clusters and noise
+colors = plt.cm.rainbow(np.linspace(0, 1, len(unique_labels)))
+
+# Plot each cluster with a unique color
+for label, color in zip(unique_labels, colors):
+    if label == -1:  # -1 indicates noise
+        cluster_label = "Noise"
+        marker = 'x'  # Different marker for noise
+    else:
+        cluster_label = f"Cluster {label}"
+        marker = 'o'  # Default marker for clusters
+
+    mask = (y_pred == label)
+    ax.scatter(X[mask, 0], X[mask, 1], X[mask, 2], c=[color], label=cluster_label, marker=marker)
+
+plt.legend()
+plt.show()
+
+###################################################################################################
+
+plane1 = pyrsc.Plane()
+best_eq_red, best_inliers_red = plane1.fit(X[red,:], 0.01)
+print(best_eq_red)
+
+plane2 = pyrsc.Plane()
+best_eq_blue, best_inliers_blue = plane2.fit(X[blue,:], 0.01)
+print(best_eq_blue)
+
+plane3 = pyrsc.Plane()
+best_eq_green, best_inliers_green = plane3.fit(X[green,:], 0.01)
+print(best_eq_green)
